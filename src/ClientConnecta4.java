@@ -1,6 +1,4 @@
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
@@ -10,7 +8,7 @@ public class ClientConnecta4 {
     private String Nom, ipSrv;
     private int intents;
     private InetAddress adrecaDesti;
-    //private Tauler t;
+    private Tauler t;
     private Jugada j;
     public ClientConnecta4(String ip, int port){
         this.portDesti = port;
@@ -24,7 +22,7 @@ public class ClientConnecta4 {
         }
     }
 
-    public void runClient() throws IOException {
+    public void runClient() throws IOException, ClassNotFoundException {
         byte [] receivedData = new byte[1024];
         int n;
         DatagramPacket packet;
@@ -34,12 +32,16 @@ public class ClientConnecta4 {
         //Bucle de joc
         while(result!=0 && result!=-2) {
 
+
             //creació del paquet per rebre les dades
             packet = new DatagramPacket(receivedData, 1024);
             //espera de les dades
             socket.setSoTimeout(5000);
             try {
                 socket.receive(packet);
+                ByteArrayInputStream in = new ByteArrayInputStream(packet.getData());
+                ObjectInputStream ois = new ObjectInputStream(in);
+                t = (Tauler) ois.readObject();
                 //processament de les dades rebudes i obtenció de la resposta
                 //result = getDataToRequest(packet.getData(), packet.getLength());
             }catch(SocketTimeoutException e) {
@@ -79,7 +81,7 @@ public class ClientConnecta4 {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException {
         String ipSrv;
         int port;
 
