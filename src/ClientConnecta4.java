@@ -21,10 +21,13 @@ public class ClientConnecta4 {
             e.printStackTrace();
         }
     }
-
+    public void setNom(String n) {
+        Nom=n;
+    }
     public void runClient() throws IOException, ClassNotFoundException {
         byte [] receivedData = new byte[1024];
         int n;
+        String ox;
         DatagramPacket packet;
         DatagramSocket socket = new DatagramSocket();
         //Missatge de benvinguda
@@ -57,7 +60,9 @@ public class ClientConnecta4 {
 
             Scanner sc = new Scanner(System.in);
             n = sc.nextInt();
+            ox = sc.nextLine();
             //j.Nom = Nom;
+            j.ox = ox;
             j.num = n;
             //byte[] missatge = ByteBuffer.allocate(4).putInt(n).array();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -84,17 +89,18 @@ public class ClientConnecta4 {
     public static void main(String[] args) throws ClassNotFoundException {
         String ipSrv;
         int port;
-
+        String jugador;
         //Demanem la ip del servidor i nom del jugador
         System.out.println("IP del servidor?");
         Scanner sip = new Scanner(System.in);
         ipSrv = sip.nextLine();
         System.out.println("Port?:");
         port = sip.nextInt();
-
+        System.out.println("Nom jugador:");
+        jugador = sip.next();
         ClientConnecta4 cAdivina = new ClientConnecta4(ipSrv, port);
 
-
+        cAdivina.setNom(jugador);
         try {
             cAdivina.runClient();
         } catch (IOException e) {
