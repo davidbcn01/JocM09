@@ -6,11 +6,9 @@ import java.net.Socket;
 public class ThreadServidor implements  Runnable{
     Socket clientSocket1 = null;
     Socket clientSocket2 = null;
-    ObjectInputStream in = null;
-    ObjectOutputStream out = null;
-    ObjectInputStream in2 = null;
-    ObjectOutputStream out2 = null;
-    Tauler taulerEntrant;
+    boolean turno = true;
+    Tauler taulerEntrant = new Tauler();
+
     Jugada j;
 
     boolean acabat;
@@ -18,41 +16,74 @@ public class ThreadServidor implements  Runnable{
 
     public ThreadServidor(Socket clientSocket1, Socket clientSocket2) throws IOException {
         this.clientSocket1 = clientSocket1;
-        System.out.println("Contructor");
-        acabat = false;
-        out= new ObjectOutputStream(clientSocket1.getOutputStream());
-        in =new ObjectInputStream(clientSocket1.getInputStream());
         this.clientSocket2 = clientSocket2;
-        System.out.println("Contructor");
-        acabat = false;
-        out2= new ObjectOutputStream(clientSocket2.getOutputStream());
-        in2 =new ObjectInputStream(clientSocket2.getInputStream());
 
-        System.out.println("implementacio");
 
     }
 
     @Override
     public void run() {
-        System.out.println("ThreadServer");
-        try {
-            while(!acabat) {
+//        System.out.println("ThreadServer");
+//        try {
+//            while(!acabat) {
+//
+//                j = (Jugada) in.readObject();
+//                //por aqui
+//                taulerEntrant.setJugadaTauler(j.num,j.ox);
+//                taulerEntrant.showTauler();
+//
+//                out.writeObject(taulerEntrant.tauler);
+//
+//
+//                out.flush();
+//
+//                acabat = true;
 
-              j = (Jugada) in.readObject();
-              //por aqui
-                taulerEntrant.setJugadaTauler(j.num,j.ox);
-                taulerEntrant.showTauler();
+            try{
+                ObjectInputStream in =new ObjectInputStream(clientSocket1.getInputStream());
+                ObjectOutputStream out = new ObjectOutputStream(clientSocket1.getOutputStream());
 
-                out.writeObject(taulerEntrant.tauler);
+                ObjectInputStream in2 = new ObjectInputStream(clientSocket2.getInputStream());
+                ObjectOutputStream out2 = new ObjectOutputStream(clientSocket2.getOutputStream());
+
+                out.writeObject(true);
+                out2.writeObject(false);
+
+                while (!acabat){
+                    out.reset();
+                    out2.reset();
+                    if(turno){
+                        out.writeObject(true);
+                        out2.writeObject(true);
+
+                        out.writeObject(taulerEntrant);
 
 
-                out.flush();
+                        j = (Jugada) in.readObject();
 
-                acabat = true;
+                        taulerEntrant.setJugadaTauler(j.num,j.ox);
 
+                        out.reset();
+                        out.writeObject(taulerEntrant);
+                        turno = !turno;
+                    }else{
+                        out2.writeObject(false);
+                        out.writeObject(false);
 
+                        out2.writeObject(taulerEntrant);
 
-            }
+                        j = (Jugada) in2.readObject();
+
+                        taulerEntrant.setJugadaTauler(j.num,j.ox);
+
+                        out2.reset();
+                        out2.writeObject(taulerEntrant);
+                        turno = !turno;
+                    }
+                    out.flush();
+                    out2.flush();
+                }
+
         }catch(IOException | ClassNotFoundException e){
             System.out.println(e.getLocalizedMessage());
         }

@@ -25,12 +25,13 @@ public class ServidorConnecta4 {
 
             try {
                 serverSocket = new ServerSocket(port);
-while(true) {
-    if (clientSocket1.isConnected() && clientSocket2.isConnected()) { //esperar connexió del client i llançar thread
-        clientSocket1 = serverSocket.accept();
-        clientSocket2 = serverSocket.accept();
+        while(true) {
+            clientSocket1 = serverSocket.accept();
+            clientSocket2 = serverSocket.accept();
+                 if (clientSocket1.isConnected() && clientSocket2.isConnected()) { //esperar connexió del client i llançar thread
 
-        System.out.println("Despres del accept");
+
+                        System.out.println("Despres del accept");
         //Llançar Thread per establir la comunicació
         ThreadServidor FilServidor = new ThreadServidor(clientSocket1,clientSocket2);
         Thread client = new Thread(FilServidor);
